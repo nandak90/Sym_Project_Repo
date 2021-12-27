@@ -47,14 +47,14 @@ resource "aws_internet_gateway" "sym_vpc_igw" {
   tags = {
     Name = "SYM VPC Internet Gateway"
   }
-  vpc_id = aws_vpc.my_vpc.id
+  vpc_id = aws_vpc.sym_vpc.id
 }
 
 resource "aws_route_table" "sym_vpc_public" {
     tags = {
     Name = "Sym Public Route Table"
   }
-    vpc_id = aws_vpc.my_vpc.id
+    vpc_id = aws_vpc.sym_vpc.id
     route {
         cidr_block = "0.0.0.0/0"
         gateway_id = aws_internet_gateway.sym_vpc_igw.id
@@ -71,7 +71,7 @@ resource "aws_route_table_association" "sym_vpc_ap_southeast_2_public" {
     route_table_id = aws_route_table.sym_vpc_public.id
 }
 
-#Creating a Security Group for the Web Instance
+#Creating a Security Group for the Web
 resource "aws_security_group" "web_sg"{
     tags = {
     Name = "Web Security Group"
@@ -95,18 +95,35 @@ resource "aws_security_group" "web_sg"{
   }
 }
 
-#Creating a Security Group for the Database Instance
-resource "aws_security_group" "web_sg"{
+#Creating a Security Group for the Database
+resource "aws_security_group" "db_sg"{
     tags = {
-    Name = "Web Security Group"
+    Name = "DB Security Group"
   }
     name = "web_sg"
     description = "Allow HTTP inbound traffic"
     vpc_id = aws_vpc.sym_vpc.id
-
     ingress {
     protocol = "tcp"
     from_port = 5432
     to_port = 5432
     security_groups = [aws_security_group.web_sg.id]
   }
+
+#Create Web Server
+resource "aws_launch_configuration" "web" {
+  name_prefix = "symweb-"
+
+  image_id = "ami-0b28dfc7adc325ef4"
+  instance_type = "t2.xlarge"
+  key_name = "Sym Web Server"
+
+  security_groups = [ aws_security_group.web_sg.id ]
+  associate_public_ip_address = true
+
+  USER_DATA
+
+  lifecycle {
+  create_before_destroy = true
+  }
+}
