@@ -23,14 +23,17 @@ pipeline {
     
     //Scan the compiled code with SonarQube 
     Stage('Scan'){
+      steps{
       def scannerHome = tool 'SonarScanner 4.0';
       sh "${sonarqubeHome}/bin/sonar-scanner"
+      }
     }
     
-    //Publish the artifacts to Nexus/Jfrog Artifactory
+    //Publish the artifacts to Nexus/Jfrog Artifactory. I am publishing to Electric Flow repository as I am planning to use Flow as CD tool.
     Stage('Publish'){ 
         steps {
-          sh 'curl -v -u $userName:$nexusPwd --upload-file build.zip http://nexus/repository/symbiosis/web/$buildVersion/'
+          //sh 'curl -v -u $userName:$nexusPwd --upload-file build.zip http://nexus/repository/symbiosis/web/$buildVersion/'
+          sh 'ectool publishArtifactVersion --artifactName  --version --repositoryName'
       }
     }
     
