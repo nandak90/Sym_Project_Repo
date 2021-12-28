@@ -15,3 +15,6 @@ This Repository servers as the code repository for the app and infra for Symbios
 
 -->Created a Dockerfile to build the nodeJS app build and push the image.
 
+-->Prepared a plan in a document to show how it executes.
+
+Please provide your feedback.
