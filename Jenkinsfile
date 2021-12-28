@@ -22,6 +22,13 @@ pipeline {
       }
     }
     
+    //Build a docker image
+    stage('Build Image') {
+      steps {
+        sh 'docker build -t symbiosis/web-app-1.0'
+      }
+    }
+    
     //Scan the compiled code with SonarQube 
     Stage('Scan'){
       steps{
