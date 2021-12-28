@@ -1,3 +1,4 @@
+//A rough template of the stages in the CI in Jenkins
 #!/usr/bin/env groovy
 pipeline {
   agent { node { label 'symbiosis' } }
