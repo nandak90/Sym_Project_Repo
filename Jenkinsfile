@@ -26,6 +26,10 @@ pipeline {
     stage('Build Image') {
       steps {
         sh 'docker build -t symbiosis/web-app-1.0 .'
+        withCredentials([straing(credentialsId: 'symbiosis-pwd', variable: 'sysmbiosisPwd')]){
+        sh "docker login -u symbiosis -p ${symbiosis-pwd}"
+        sh 'docker push -t symbiosis/web-app-1.0'
+        }
       }
     }
     
@@ -37,14 +41,33 @@ pipeline {
       }
     }
     
-    //Publish the artifacts to Nexus/Jfrog Artifactory. I am publishing to Electric Flow repository as I am planning to use Flow as CD tool.
+    //Publish the artifacts to Nexus/Jfrog Artifactory. Since I am familiar in using the Cloudbes Electric flow, I will publish to flow artifactory as well to setup a CD pipeline.
+    //Alternatively I can use ssh to deploy via Jenkins as well to the target servers
     Stage('Publish'){ 
         steps {
           //sh 'curl -v -u $userName:$nexusPwd --upload-file build.zip http://nexus/repository/symbiosis/web/$buildVersion/'
-          sh 'ectool publishArtifactVersion --artifactName  --version --repositoryName'
+          //sh 'ectool publishArtifactVersion --artifactName  --version --repositoryName'
       }
     }
     
-    
+    //Deploy and Run the container on the target servers
+    Stage('Deploy Dev'){
+        def runDocker = 'docker run -p 8080:8080 -d -name web-app symbiosis/web-app:1.0'
+      sshagent('dev-server') {
+        sh "ssh -o StrictHostKeyChecking=no ec2-user@10.11.12.13 ${dockerRun}"
+    }
+  }
+   
+    Stage('Deploy UAT'){
+        def runDocker = 'docker run -p 8080:8080 -d -name web-app symbiosis/web-app:1.0'
+      sshagent('uat-server') {
+        sh "ssh -o StrictHostKeyChecking=no ec2-user@10.14.15.16 ${dockerRun}"
+    }
+  }
+    Stage('Deploy PROD'){
+        def runDocker = 'docker run -p 8080:8080 -d -name web-app symbiosis/web-app:1.0'
+      sshagent('prod-server') {
+        sh "ssh -o StrictHostKeyChecking=no ec2-user@10.17.18.19 ${dockerRun}"
+    }
   }
 }
