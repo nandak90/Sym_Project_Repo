@@ -25,7 +25,7 @@ pipeline {
     //Scan the compiled code with SonarQube 
     Stage('Scan'){
       steps{
-      def scannerHome = tool 'SonarScanner 4.0';
+      def sonarqubeHome = tool 'SonarScanner 4.0';
       sh "${sonarqubeHome}/bin/sonar-scanner"
       }
     }
