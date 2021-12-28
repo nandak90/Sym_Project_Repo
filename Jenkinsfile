@@ -25,7 +25,7 @@ pipeline {
     //Build a docker image
     stage('Build Image') {
       steps {
-        sh 'docker build -t symbiosis/web-app-1.0'
+        sh 'docker build -t symbiosis/web-app-1.0 .'
       }
     }
     
